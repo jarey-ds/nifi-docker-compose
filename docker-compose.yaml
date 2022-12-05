@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+    nifi:
+        restart: always
+        build: .
+        image: nifi_teradata_oracle
+        container_name: apache_nifi
+#        image: apache/nifi:1.19.0
+        container_name: apache_nifi
+        expose:
+            - ${NIFI_INTERNAL_PORT}
+        networks:
+            - mydefault
+        restart: always
+        environment:
+            - NIFI_WEB_HTTPS_PORT=${NIFI_INTERNAL_PORT}
+            - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_USER}
+            - SINGLE_USER_CREDENTIALS_PASSWORD=${NIFI_PASSWORD}
+        ports:
+            - '${NIFI_EXTERNAL_PORT}:${NIFI_INTERNAL_PORT}'
+        volumes:
+            - nifi_data:/var/lib/postgresql/data
+        env_file:
+            - .env
+    mysqldb:
+        image: mysql:8
+        restart: unless-stopped
+        env_file: ./.env
+        environment:
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+        ports:
+            - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+        volumes:
+            - db:/var/lib/mysql
+        networks:
+            - mydefault
+            
+    postgresqldb:
+        restart: always
+        image: postgres:latest
+        container_name: postgresqldb
+        expose:
+            - ${POSTGRES_DB_PORT}
+        networks:
+            - mydefault
+        restart: always
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB_NAME}
+            - POSTGRES_USER=${POSTGRES_DB_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_DB_PW}
+        ports:
+            - '${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}'
+        volumes:
+            - db_datapg:/var/lib/postgresql/data
+        env_file:
+            - .env
+            
+networks:
+    mydefault:
+        driver: bridge
+
+volumes:
+    nifi_data:
+    db:
+    db_datapg:
