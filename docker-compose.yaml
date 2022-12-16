@@ -3,16 +3,13 @@ version: '3.8'
 services:
     nifi:
         restart: always
-        build: .
-        image: nifi_teradata_oracle
+        #build: .
         container_name: apache_nifi
-#        image: apache/nifi:1.19.0
-        container_name: apache_nifi
+        image: apache/nifi:1.19.0
         expose:
             - ${NIFI_INTERNAL_PORT}
         networks:
             - mydefault
-        restart: always
         environment:
             - NIFI_WEB_HTTPS_PORT=${NIFI_INTERNAL_PORT}
             - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_USER}
@@ -21,6 +18,11 @@ services:
             - '${NIFI_EXTERNAL_PORT}:${NIFI_INTERNAL_PORT}'
         volumes:
             - nifi_data:/var/lib/postgresql/data
+            - ./drivers/mysql/mysql-connector-java-8.0.27.jar:/opt/nifi/nifi-current/lib/mysql-connector-java-8.0.27.jar
+            - ./drivers/oracle/ojdbc11-21.7.0.0.jar:/opt/nifi/nifi-current/lib/ojdbc11-21.7.0.0.jar
+            - ./drivers/postgresql/postgresql-42.5.1.jar:/opt/nifi/nifi-current/lib/postgresql-42.5.1.jar
+            - ./drivers/snowflake/snowflake-jdbc-3.9.2.jar:/opt/nifi/nifi-current/lib/snowflake-jdbc-3.9.2.jar
+            - ./drivers/teradata/terajdbc4.jar:/opt/nifi/nifi-current/lib/terajdbc4.jar
         env_file:
             - .env
     mysqldb:
@@ -40,7 +42,6 @@ services:
             - mydefault
             
     postgresqldb:
-        restart: always
         image: postgres:latest
         container_name: postgresqldb
         expose:

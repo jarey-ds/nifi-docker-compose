@@ -9,4 +9,6 @@ COPY ./drivers/teradata/terajdbc4.jar /opt/nifi/nifi-current/lib
 COPY ./drivers/mysql/mysql-connector-java-8.0.27.jar /opt/nifi/nifi-current/lib
 #Postgresql
 COPY ./drivers/postgresql/postgresql-42.5.1.jar /opt/nifi/nifi-current/lib
+#Snowflake
+COPY ./drivers/snowflake/snowflake-jdbc-3.9.2.jar /opt/nifi/nifi-current/lib
 
